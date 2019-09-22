@@ -28,7 +28,7 @@ router.get('/product/:id', (req, res) => {
         .then(data => {
             data.title = data.title[currentLanguage];
             data.description = data.description[currentLanguage];
-            data.feutures = JSON.parse(data.feutures[currentLanguage]);
+            data.feutures = JSON.parse(data.feutures[0]);
            res.send(data)
         });
 });
