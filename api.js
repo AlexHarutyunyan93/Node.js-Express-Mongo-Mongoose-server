@@ -92,16 +92,6 @@ router.delete('/product/:id', (req, res) => {
                 .then( res => console.log(res))
         });
 });
-
-router.post('/home',(req, res) => {
-    HomePage.create(req.body)
-        .then(data => res.send(data))
-});
-router.post('/about', (req, res) => {
-    const {ru, en, am} = req.body;
-    aboutCompany.create({ru, en, am})
-});
-
 router.post('/add-product', upload, ({body, files}, res) => {
     if (!body) return res.sendStatus(400);
 
