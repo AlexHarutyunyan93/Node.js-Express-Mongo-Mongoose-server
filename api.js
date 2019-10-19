@@ -1,9 +1,20 @@
 const express = require('express');
 const router  = express.Router();
 const fs      = require('fs');
+const cors = require('cors');
 
 const { Dresses, upload, HomePage, aboutCompany } = require('./dresses');
 const { formatDate, getCallerIP, searchEngine } = require('./helpers');
+
+const whitelist = ["http://localhost:3000"];
+const corsOptions = {origin: (origin, callback) => {
+        if(whitelist.indexOf(origin) != -1) {
+            callback(null, true)
+        } else {
+            callback(new Error( "Not allowed by CORS"))
+        }
+    }
+};
 
 //////////////GET ITEMS////////////////////////
 router.get('/search/', (req, res) => {
@@ -23,13 +34,15 @@ router.get('/search/', (req, res) => {
 });
 
 router.get('/product/:id', (req, res) => {
-    const currentLanguage = req.query.lanuage;
+    const currentLanguage = req.query.language;
     Dresses.findOne({ _id: req.params.id })
         .then(data => {
             data.title = data.title[currentLanguage];
             data.description = data.description[currentLanguage];
+            data.feutures = data.feutures[currentLanguage];
             data.feutures = JSON.parse(data.feutures[0]);
-           res.send(data)
+            res.send(data);
+
         });
 });
 
@@ -69,7 +82,7 @@ router.get('/items/', (req, res) => {
 
 ////// PUT Item /////
 
-router.put('/product/:id', (req, res) => {
+router.put('/product/:id', cors(corsOptions), (req, res) => {
     Dresses.findByIdAndUpdate({ _id: req.params.id }, req.body )
         .then(() => {
             Dresses.findOne({ _id: req.params.id })
@@ -80,7 +93,7 @@ router.put('/product/:id', (req, res) => {
 });
 ///// Delete Item  /////
 
-router.delete('/product/:id', (req, res) => {
+router.delete('/product/:id', cors(corsOptions), (req, res) => {
     const path = "http://localhost:4000/";
     Dresses.findOne({ _id: req.params.id })
         .then(data => {
@@ -92,7 +105,17 @@ router.delete('/product/:id', (req, res) => {
                 .then( res => console.log(res))
         });
 });
-router.post('/add-product', upload, ({body, files}, res) => {
+
+router.post('/home',(req, res) => {
+    HomePage.create(req.body)
+        .then(data => res.send(data))
+});
+router.post('/about', (req, res) => {
+    const {ru, en, am} = req.body;
+    aboutCompany.create({ru, en, am})
+});
+
+router.post('/add-product', cors(corsOptions), upload, ({body, files}, res) => {
     if (!body) return res.sendStatus(400);
 
         const dateOfRes = formatDate(new Date());
