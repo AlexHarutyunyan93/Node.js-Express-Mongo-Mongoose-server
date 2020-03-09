@@ -1,21 +1,19 @@
-const mongoose        = require('mongoose');
-const Schema          = mongoose.Schema;
-const path            = require('path');
-const multer          = require('multer');
-const { generate }    = require('./helpers');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-class MultilingualString {
-
-}
-
-const CardSchema = new Schema({
+const schema = new Schema({
     category: Number,
-    title: Object,
+    title: Map,
     price: Number,
-    discount: Object,
+    discount: Number,
+    discountInPercent: Number,
     imageUrls: Array,
     dateOfRes: String,
     colors: Array,
-    description: Object,
+    description: Map,
     feutures: Array
 });
+
+schema.set('toJSON', { virtuals: true });
+
+module.exports = mongoose.model('cards', schema);
