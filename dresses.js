@@ -15,6 +15,7 @@ const DressSchema = new Schema({
     description: Array,
     feutures: Array
 });
+
 const AboutSchema = new Schema({
     ru: {
         title: String,
